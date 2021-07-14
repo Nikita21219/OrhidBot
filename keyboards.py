@@ -80,5 +80,7 @@ def get_social_networks_markup():
     vk_button = telebot.types.InlineKeyboardButton('VK 🌐', url='https://vk.com/orchid_74')
     ok_button = telebot.types.InlineKeyboardButton('OK 🌐', url='https://ok.ru/meditsinsi')
     inst_button = telebot.types.InlineKeyboardButton('Instagram 🌐', url='https://www.instagram.com/orhideya7414/')
+    site_button = telebot.types.InlineKeyboardButton('Наш сайт 🌐', url='https://xn---74-mddfq5bq9bzg.xn--p1ai/')
     markup.add(vk_button, ok_button, inst_button)
+    markup.add(site_button)
     return markup
