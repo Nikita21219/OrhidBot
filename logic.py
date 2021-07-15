@@ -4,6 +4,20 @@ from babel.dates import format_datetime
 
 from config import URL_USERS, URL_SPECIALTIES, URL_CLIENTS, HEADERS_AUTH
 
+month_dict = {
+    'января': '01',
+    'февраля': '02',
+    'марта': '03',
+    'апреля': '04',
+    'мая': '05',
+    'июня': '06',
+    'июля': '07',
+    'августа': '08',
+    'сентября': '09',
+    'октября': '10',
+    'ноября': '11',
+    'декабря': '12'
+}
 
 def get_users():
     user_params_1 = {
@@ -97,7 +111,6 @@ def get_date_ru(datetime_date):
     return format_datetime(date, 'd MMMM', locale='ru_RU')
 
 
-
 def create_client(phone, client_full_name):
     global client_id
     client = client_full_name.split()
@@ -115,3 +128,11 @@ def create_client(phone, client_full_name):
         client_id = create_client['data']['id']
     except:
         return 0
+
+
+def date_ru_in_datetime(date_ru):
+    date_list = date_ru.split()
+    date_list[2] = month_dict[date_list[2]]
+    date_dt = ' '.join(date_list)
+    dt = datetime.datetime.strptime(date_dt, '%Y %d %m')
+    return dt

@@ -1,11 +1,10 @@
 import telebot
 import datetime
 import requests
-import locale
 
 from config import BOT_TOKEN, URL_USERS, URL_SHEDULES, URL_APPOINTMENTS, HEADERS_AUTH
 from masks import is_date, is_time, is_full_name, is_free_time
-from logic import get_user_full_name, check_client_in_crm, get_date_ru, create_client
+from logic import get_user_full_name, check_client_in_crm, get_date_ru, create_client, date_ru_in_datetime
 from keyboards import get_users_markup, get_main_menu_markup, get_schedule_for_4_weeks_markup, get_confirming_markup, get_yes_or_no_markup, get_social_networks_markup
 
 
@@ -23,9 +22,7 @@ phone = ''
 def get_times_markup(user_id, date):
     global chosen_date
     global min_delta_appointment
-    locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
-    date = datetime.datetime.strptime(date, '%Y %d %B')
-    chosen_date = datetime.datetime.strftime(date, '%Y-%m-%d')
+    chosen_date = datetime.datetime.strftime(date_ru_in_datetime(date), '%Y-%m-%d')
     schedules_params = {
         'date': chosen_date,
         'days_count': 1,
