@@ -11,8 +11,11 @@ def get_users_markup():
     keyboard = telebot.types.InlineKeyboardMarkup()
     # Добавляю каждого врача в клавиатуру
     for user in get_users():
-        doctor_button = telebot.types.InlineKeyboardButton(user['full_name'], callback_data=user['id'])
-        keyboard.add(doctor_button)
+        if user['full_name']:
+            doctor_button = telebot.types.InlineKeyboardButton(user['full_name'], callback_data=user['id'])
+            keyboard.add(doctor_button)
+    main_menu_button = telebot.types.InlineKeyboardButton('В главное меню ◀️', callback_data='main_menu')
+    keyboard.add(main_menu_button)
     return keyboard
 
 
@@ -46,9 +49,9 @@ def get_schedule_for_4_weeks_markup(user_id):
         if day['worktimes'][0]['worktime']:
             available_days.append(datetime.datetime.strptime(day['date'], '%Y-%m-%d'))
 
-    markup = telebot.types.InlineKeyboardMarkup()
     # Если есть рабочие дни отпраляю их
     if available_days:
+        markup = telebot.types.InlineKeyboardMarkup()
         for day in available_days:
             date_ru = str(format_datetime(day, 'd MMMM', locale='ru_RU'))
             year = datetime.datetime.now()
@@ -56,6 +59,8 @@ def get_schedule_for_4_weeks_markup(user_id):
             callback = year + ' ' + date_ru
             date_button = telebot.types.InlineKeyboardButton(date_ru, callback_data=callback)
             markup.add(date_button)
+        main_menu_button = telebot.types.InlineKeyboardButton('В главное меню ◀️', callback_data='main_menu')
+        markup.add(main_menu_button)
         return markup
     return 0
 
@@ -72,6 +77,8 @@ def get_yes_or_no_markup():
     yes_button = telebot.types.InlineKeyboardButton('Да', callback_data='yes')
     no_button = telebot.types.InlineKeyboardButton('Нет', callback_data='no')
     keyboard.add(yes_button, no_button)
+    main_menu_button = telebot.types.InlineKeyboardButton('В главное меню ◀️', callback_data='main_menu')
+    keyboard.add(main_menu_button)
     return keyboard
 
 
@@ -83,4 +90,6 @@ def get_social_networks_markup():
     site_button = telebot.types.InlineKeyboardButton('Наш сайт 🌐', url='https://xn---74-mddfq5bq9bzg.xn--p1ai/')
     markup.add(vk_button, ok_button, inst_button)
     markup.add(site_button)
+    main_menu_button = telebot.types.InlineKeyboardButton('В главное меню ◀️', callback_data='main_menu')
+    markup.add(main_menu_button)
     return markup

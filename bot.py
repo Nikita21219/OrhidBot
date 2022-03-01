@@ -106,6 +106,8 @@ def get_times_markup(user_id, date):
         for time in sorted(free_times):
             time_button = telebot.types.InlineKeyboardButton(time, callback_data=time)
             keyboard.add(time_button)
+        main_menu_button = telebot.types.InlineKeyboardButton('В главное меню ◀️', callback_data='main_menu')
+        keyboard.add(main_menu_button)
         return keyboard
     return 0
 
@@ -124,7 +126,6 @@ def make_appointment(user_id, chosen_date, chosen_time, client_id):
         'appointment_type_id': 1,
         'appointment_source_id': 2
     }
-    # return 1
     my_post_request = requests.post(URL_APPOINTMENTS, headers=HEADERS_AUTH, params=create_appointment_params)
     if my_post_request:
         return 1
@@ -154,9 +155,9 @@ def bot_message(message):
         elif message.text == 'Информация':
             bot.send_message(message.chat.id, 'Многопрофильный медицинский центр Белая Орхидея - это современные методы обследования и диагностики, передовое техническое оснащение, высокотехнологичное оборудование, безупречная вежливость и внимательность персонала а также сервис высочайшего уровня. \n\nМы предоставляем такие услуги как:\nУрология.\nЭндокринология.\nAкушерство и гинекология.\nГастроэнтеролог.\nДерматология.\nДетский невролог.\nЛазерная хирургия.\nКардиология.\nЛаборатория.\nЛор.\nМаммология.\nНеврология.\nОнкология.\nОфтальмология.\nПроктология.\nТерапия.\nТравмотолог-ортопед.\nУЗИ.\nХирургия.\nФлеболог\n\nНаши соц.сети:', reply_markup=get_social_networks_markup())
         elif message.text == 'График':
-            bot.send_message(message.chat.id, 'Понедельник - суббота: с 8.00 до 20.00\nВоскресенье: с 8.00 до 18.00\nБез перерывов')
+            bot.send_message(message.chat.id, 'Понедельник - суббота: с 8.00 до 20.00\nВоскресенье: с 8.00 до 18.00\nБез перерывов', reply_markup=get_main_menu_markup())
         elif message.text == 'Контакты':
-            bot.send_message(message.chat.id, 'Ул. Ленина, 84, город Троицк, Челябинская область, 457100\n\nТелефоны:\n8-951-258-36-51\n8-982-363-41-00\n8-35163-5-80-10\n8-35163-7-16-61')
+            bot.send_message(message.chat.id, 'Ул. Ленина, 84, город Троицк, Челябинская область, 457100\n\nТелефоны:\n8-951-258-36-51\n8-982-363-41-00\n8-35163-5-80-10\n8-35163-7-16-61', reply_markup=get_main_menu_markup())
         # Если пользователь ввел ФИО
         elif is_full_name(message.text):
             if user_id and chosen_date and chosen_time and phone:
@@ -191,7 +192,7 @@ def query_handler(call):
             bot.send_message(call.message.chat.id, 'Выберите дату', reply_markup=markup)
         # Иначе вывожу соответствующее сообщение
         else:
-            bot.send_message(call.message.chat.id, 'У этого врача в ближайшее время нет доступного времени.\nДля более подробной информации звонить в медициский центр (поле "Контакты" в меню)')
+            bot.send_message(call.message.chat.id, 'У этого врача в ближайшее время нет доступного времени.\nДля более подробной информации звонить в медициский центр (поле "Контакты" в меню)', reply_markup=get_main_menu_markup())
     # Если callback это выбранная дата посещения
     elif is_date(call.data):
         chosen_date = call.data
@@ -200,9 +201,9 @@ def query_handler(call):
             if keyboard_times:
                 bot.send_message(call.message.chat.id, 'Выберите время', reply_markup=keyboard_times)
             else:
-                bot.send_message(call.message.chat.id, 'В этот день у врача нет свободного времени, выберите другой день')
+                bot.send_message(call.message.chat.id, 'В этот день у врача нет свободного времени, выберите другой день', reply_markup=get_main_menu_markup())
         else:
-            bot.send_message(call.message.chat.id, 'Что-то пошло не так. Попробуйте еще раз выбрать врача')
+            bot.send_message(call.message.chat.id, 'Что-то пошло не так. Попробуйте еще раз выбрать врача', reply_markup=get_main_menu_markup())
     # Если callback это выбранное время для посещения
     elif is_time(call.data):
         chosen_time = call.data
@@ -222,10 +223,12 @@ def query_handler(call):
                 reply_markup=get_confirming_markup()
             )
         else:
-            bot.send_message(call.message.chat.id, 'Что-то пошло не так')
+            bot.send_message(call.message.chat.id, 'Что-то пошло не так', reply_markup=get_main_menu_markup())
     # Обрабатываю случай когда клиента нет в crm
     elif call.data == 'no':
-        bot.send_message(call.message.chat.id, f'Введите ФИО в формате "Иванов Иван Иванович" без пробелов в начале и конце')
+        bot.send_message(call.message.chat.id, f'Введите ФИО в формате "Иванов Иван Иванович" без пробелов в начале и конце', reply_markup=get_main_menu_markup())
+    elif call.data == 'main_menu':
+        bot.send_message(call.message.chat.id, 'Вы вернулись в главное меню', reply_markup=get_main_menu_markup())
     else:
         print('Failure')
 
@@ -244,8 +247,8 @@ def read_contact_phone(message):
             bot.send_message(message.chat.id, f'Ваше имя {full_name}?', reply_markup=get_yes_or_no_markup())
         # Запрашиваю ФИО
         else:
-            bot.send_message(message.chat.id, f'Введите ФИО в формате "Иванов Иван Иванович" без пробелов в начале и конце')
+            bot.send_message(message.chat.id, f'Введите ФИО в формате "Иванов Иван Иванович" без пробелов в начале и конце', reply_markup=get_main_menu_markup())
     else:
-        bot.send_message(message.chat.id, 'Что-то пошло не так')
+        bot.send_message(message.chat.id, 'Что-то пошло не так', reply_markup=get_main_menu_markup())
 
 bot.polling(none_stop=True, interval=0)
