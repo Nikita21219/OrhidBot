@@ -146,6 +146,7 @@ def bot_message(message):
     global client_full_name
     global chosen_date
     global chosen_time
+    global client_id
     if message.chat.type == 'private':
         if message.text == 'В главное меню ◀️':
             bot.send_message(message.chat.id, 'Вы вернулись в главное меню', reply_markup=get_main_menu_markup())
@@ -162,7 +163,7 @@ def bot_message(message):
         # Если пользователь ввел ФИО
         elif is_full_name(message.text):
             if user_id and chosen_date and chosen_time and phone:
-                create_client(phone, message.text)
+                client_id = create_client(phone, message.text)
                 bot.send_message(message.chat.id, f'Информация правильная?\nВаше ФИО: {message.text}\nВаш телефон: {phone}', reply_markup=get_yes_or_no_markup())
             else:
                 bot.send_message(message.chat.id, 'Я тебя не понимаю')
@@ -230,8 +231,6 @@ def query_handler(call):
         bot.send_message(call.message.chat.id, f'Введите ФИО в формате "Иванов Иван Иванович" без пробелов в начале и конце', reply_markup=get_main_menu_markup())
     elif call.data == 'main_menu':
         bot.send_message(call.message.chat.id, 'Вы вернулись в главное меню', reply_markup=get_main_menu_markup())
-    else:
-        print('Failure')
 
 
 @bot.message_handler(content_types=['contact'])

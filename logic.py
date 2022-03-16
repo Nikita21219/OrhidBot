@@ -96,7 +96,6 @@ def get_users():
 		flag = 0
 		for data in specialties.json():
 			if data['worktimes'][0]['worktime']:
-				# print(user['full_name'])
 				flag = 1
 				break
 		if flag:
@@ -134,7 +133,6 @@ def get_date_ru(datetime_date):
 
 
 def create_client(phone, client_full_name):
-	global client_id
 	client = client_full_name.split()
 	surname = client[0]
 	name = client[1]
@@ -148,7 +146,7 @@ def create_client(phone, client_full_name):
 	try:
 		create_client = requests.post(
 			URL_CLIENTS, headers=HEADERS_AUTH, params=create_client_params).json()
-		client_id = create_client['data']['id']
+		return create_client['data']['id']
 	except:
 		return 0
 
