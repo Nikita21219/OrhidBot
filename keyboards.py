@@ -12,7 +12,10 @@ def get_users_markup():
     # Добавляю каждого врача в клавиатуру
     for user in get_users():
         if user['full_name']:
-            doctor_button = telebot.types.InlineKeyboardButton(user['full_name'], callback_data=user['id'])
+            full_name_split = user['full_name'].split()
+            name = full_name_split[0] + ' ' + full_name_split[1][0] + '.' + full_name_split[2][0] + '.' 
+            text_button = name + ' - ' + user['specialty_ids'][0]['title']
+            doctor_button = telebot.types.InlineKeyboardButton(text_button, callback_data=user['id'])
             keyboard.add(doctor_button)
     main_menu_button = telebot.types.InlineKeyboardButton('В главное меню ◀️', callback_data='main_menu')
     keyboard.add(main_menu_button)
