@@ -212,7 +212,7 @@ def query_handler(call):
         phone_markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         phone_markup.add(telebot.types.KeyboardButton('Отправить свой номер телефона ☎️', request_contact=True))
         phone_markup.add(telebot.types.KeyboardButton('В главное меню ◀️'))
-        bot.send_message(call.message.chat.id, 'Для записи на прием нам необходим твой номер телефона', reply_markup=phone_markup)
+        bot.send_message(call.message.chat.id, 'Для записи на прием необходим ваш номер телефона', reply_markup=phone_markup)
     # Обрабатываю случай когда клиент есть в crm
     elif call.data == 'yes':
         if phone and user_id and chosen_date and chosen_time:
