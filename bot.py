@@ -156,6 +156,11 @@ def start(message):
     )
 
 
+@bot.message_handler(commands=['menu'])
+def menu(message):
+            bot.send_message(message.chat.id, 'Вы вернулись в главное меню', reply_markup=get_main_menu_markup())
+
+
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     global client_full_name
