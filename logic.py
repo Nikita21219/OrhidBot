@@ -1,5 +1,6 @@
 import requests
 import datetime
+import re
 from babel.dates import format_datetime
 
 from config import URL_SHEDULES, URL_USERS, URL_SPECIALTIES, URL_CLIENTS, HEADERS_AUTH
@@ -157,3 +158,11 @@ def date_ru_in_datetime(date_ru):
 	date_dt = ' '.join(date_list)
 	dt = datetime.datetime.strptime(date_dt, '%Y %d %m')
 	return dt
+
+
+def is_number_phone(text):
+	pattern = r'\b\+?[7,8](\s*\d{3}\s*\d{3}\s*\d{2}\s*\d{2})\b'
+	if re.search(pattern, text):
+		return 1
+	return 0
+

@@ -4,7 +4,7 @@ import requests
 
 from config import BOT_TOKEN, URL_USERS, URL_SHEDULES, URL_APPOINTMENTS, HEADERS_AUTH
 from masks import is_date, is_time, is_full_name, is_free_time
-from logic import get_user_full_name, check_client_in_crm, get_date_ru, create_client, date_ru_in_datetime
+from logic import get_user_full_name, check_client_in_crm, get_date_ru, create_client, date_ru_in_datetime, is_number_phone
 from keyboards import get_users_markup, get_main_menu_markup, get_schedule_for_4_weeks_markup, get_confirming_markup, get_yes_or_no_markup, get_social_networks_markup
 
 
@@ -132,6 +132,21 @@ def make_appointment(user_id, chosen_date, chosen_time, client_id):
     return 0
 
 
+def ask_name(phone, message):
+    # Проверяю есть ли клиент в crm
+    client = check_client_in_crm(phone)
+    if chosen_time and chosen_date and user_id:
+        if client:
+            client_id = client['id']
+            full_name = client['attributes']['surname'] + ' ' + client['attributes']['name']
+            bot.send_message(message.chat.id, f'Ваше имя {full_name}?', reply_markup=get_yes_or_no_markup())
+        # Запрашиваю ФИО
+        else:
+            bot.send_message(message.chat.id, f'Введите ФИО в формате "Иванов Иван Иванович" без пробелов в начале и конце', reply_markup=get_main_menu_markup())
+    else:
+        bot.send_message(message.chat.id, 'Что-то пошло не так', reply_markup=get_main_menu_markup())
+
+
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(
@@ -147,9 +162,13 @@ def bot_message(message):
     global chosen_date
     global chosen_time
     global client_id
+    global phone
     if message.chat.type == 'private':
         if message.text == 'В главное меню ◀️':
             bot.send_message(message.chat.id, 'Вы вернулись в главное меню', reply_markup=get_main_menu_markup())
+        elif is_number_phone(message.text):
+            phone = message.text
+            ask_name(phone, message)
         elif message.text == 'Записаться на прием':
             # Отправляю в сообщении клавиатуру полученную в функции get_users_markup
             bot.send_message(message.chat.id, 'Загружаю актуальных врачей, подождите немного')
@@ -238,17 +257,7 @@ def read_contact_phone(message):
     global client_id
     global phone
     phone = message.contact.phone_number
-    # Проверяю есть ли клиент в crm
-    client = check_client_in_crm(phone)
-    if chosen_time and chosen_date and user_id:
-        if client:
-            client_id = client['id']
-            full_name = client['attributes']['surname'] + ' ' + client['attributes']['name']
-            bot.send_message(message.chat.id, f'Ваше имя {full_name}?', reply_markup=get_yes_or_no_markup())
-        # Запрашиваю ФИО
-        else:
-            bot.send_message(message.chat.id, f'Введите ФИО в формате "Иванов Иван Иванович" без пробелов в начале и конце', reply_markup=get_main_menu_markup())
-    else:
-        bot.send_message(message.chat.id, 'Что-то пошло не так', reply_markup=get_main_menu_markup())
+    ask_name(phone, message)
+
 
 bot.polling(none_stop=True, interval=0)
