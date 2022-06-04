@@ -124,7 +124,8 @@ def make_appointment(user_id, chosen_date, chosen_time, client_id):
         'user_id': user_id,
         'client_id': client_id,
         'appointment_type_id': 1,
-        'appointment_source_id': 2
+        'appointment_source_id': 2,
+        'note': 'Запись из бота телеграм',
     }
     my_post_request = requests.post(URL_APPOINTMENTS, headers=HEADERS_AUTH, params=create_appointment_params)
     if my_post_request:
