@@ -2,7 +2,7 @@ import telebot
 import datetime
 import requests
 
-from config import BOT_TOKEN, URL_USERS, URL_SHEDULES, URL_APPOINTMENTS, HEADERS_AUTH
+from config import BOT_TOKEN, URL_USERS, URL_SHEDULES, URL_APPOINTMENTS, HEADERS_AUTH, DAD_CHAT_ID
 from masks import is_date, is_time, is_full_name, is_free_time
 from logic import get_user_full_name, check_client_in_crm, get_date_ru, create_client, date_ru_in_datetime, is_number_phone
 from keyboards import get_users_markup, get_main_menu_markup, get_schedule_for_4_weeks_markup, get_confirming_markup, get_yes_or_no_markup, get_social_networks_markup
@@ -195,6 +195,7 @@ def bot_message(message):
             if user_id and chosen_date and chosen_time and client_id and client_full_name and is_free_time(user_id, chosen_date, chosen_time):
                 if make_appointment(user_id, chosen_date, chosen_time, client_id):
                     bot.send_message(message.chat.id, f'Вы успешно записались на прием к врачу {get_user_full_name(user_id)} на {get_date_ru(chosen_date)} в {chosen_time}.\nВ ближайшее время с вами свяжется администратор')
+                    bot.send_message(DAD_CHAT_ID, f'Пользователь @{message.from_user.username} записался на прием к врачу {get_user_full_name(user_id)} на {get_date_ru(chosen_date)} в {chosen_time}.\n')
                 else:
                     bot.send_message(message.chat.id, 'Что-то пошло не так, попробуйте снова')
             else:
@@ -239,8 +240,10 @@ def query_handler(call):
         bot.send_message(call.message.chat.id, 'Для записи на прием необходим ваш номер телефона', reply_markup=phone_markup)
     # Обрабатываю случай когда клиент есть в crm
     elif call.data == 'yes':
+        #FIXME client_id 
         if phone and user_id and chosen_date and chosen_time:
             client = check_client_in_crm(phone)
+            client_id = client['id']
             client_full_name = client['attributes']['surname'] + ' ' + client['attributes']['name']
             date_ru = get_date_ru(chosen_date)
             bot.send_message(
